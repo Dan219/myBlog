@@ -2,7 +2,7 @@
 async function loadPosts() {
     try {
         // Obtener la lista de archivos en _posts
-        const response = await fetch('https://api.github.com/repos/Dan219/myBlog/_posts');
+        const response = await fetch('https://api.github.com/repos/Dan219/myBlog/contents/_posts');
         
         if (!response.ok) {
             throw new Error('No se pudieron cargar los posts');
