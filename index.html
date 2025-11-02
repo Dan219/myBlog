@@ -1,39 +1,46 @@
 <!DOCTYPE html>
 <html lang="es">
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<header class="header">
-    <div class="container">
-        <div class="logo">
-            <img src="/img/profile-pic.jpg" alt="Daniel Flores" class="profile-pic">
-            <a href="/" class="logo-text">Daniel Flores - Blog Técnico</a>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daniel Flores - Blog Técnico</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <!-- Temporal: placeholder hasta que subas foto -->
+                <div class="profile-pic" style="background: #3498db; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">DF</div>
+                <a href="/" class="logo-text">Daniel Flores - Blog Técnico</a>
+            </div>
+            <nav class="nav">
+                <ul>
+                    <li><a href="/">Inicio</a></li>
+                    <li><a href="/admin/">CMS</a></li>
+                    <li><a href="https://github.com/Dan219" target="_blank">GitHub</a></li>
+                    <li><a href="https://github.com/Dan219?tab=repositories" target="_blank">Proyectos</a></li>
+                </ul>
+            </nav>
         </div>
-        <nav class="nav">
-            <ul>
-                <li><a href="/">Inicio</a></li>
-                <li><a href="/admin/">CMS</a></li>
-                <li><a href="https://github.com/Dan219" target="_blank">GitHub</a></li>
-                <li><a href="/projects/">Proyectos</a></li>
-            </ul>
-        </nav>
-    </div>
-</header>
+    </header>
 
-<main class="main-content container">
-    <section class="posts-section">
-        <h2>Últimos Posts</h2>
-        <div id="posts-container">
-            <p>Cargando posts...</p>
+    <main class="main-content container">
+        <section class="posts-section">
+            <h2>Últimos Posts</h2>
+            <div id="posts-container">
+                <p>Cargando posts...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Daniel Flores - Blog Técnico</p>
         </div>
-    </section>
-</main>
+    </footer>
 
-<footer class="footer">
-    <div class="container">
-        <p>&copy; 2024 Mi Blog Técnico</p>
-    </div>
-</footer>
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
-
 </html>
