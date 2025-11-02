@@ -1,8 +1,10 @@
 ---
 title: "De Cero a Blog: Mi Viaje Caótico con Netlify CMS"
-date: 2025-11-01T23:47:59.330Z
 category: personal
-excerpt: "Mi experiencia configurando un blog técnico con Netlify CMS, desde la lucha con Identity hasta el deploy exitoso."
+date: 2025-11-01T23:47:59.330Z
+featured_image: /img/1.jpg
+excerpt: Mi experiencia configurando un blog técnico con Netlify CMS, desde la
+  lucha con Identity hasta el deploy exitoso.
 ---
 ## La Promesa vs La Realidad
 
