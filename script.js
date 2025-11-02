@@ -141,18 +141,106 @@ class PremiumBlog {
     }
 
     renderMagazineView() {
-        const featured = this.filteredPosts.slice(0, 2);
-        const rest = this.filteredPosts.slice(2);
+        if (this.filteredPosts.length === 0) {
+            return this.renderNoResults();
+        }
+
+        // Magazine view real: 1 post destacado grande + varios pequeños
+        const featuredPost = this.filteredPosts[0];
+        const secondaryPosts = this.filteredPosts.slice(1, 3); // 2 posts medianos
+        const remainingPosts = this.filteredPosts.slice(3); // Resto en grid
         
         return `
             <div class="magazine-layout">
-                <div class="magazine-featured">
-                    ${featured.map(post => this.renderFeaturedPost(post)).join('')}
+                <!-- Post Destacado Principal -->
+                <div class="magazine-hero">
+                    ${this.renderMagazineHero(featuredPost)}
                 </div>
-                <div class="magazine-grid posts-grid">
-                    ${rest.map(post => this.renderPostCard(post)).join('')}
-                </div>
+                
+                <!-- Posts Secundarios -->
+                ${secondaryPosts.length > 0 ? `
+                    <div class="magazine-secondary">
+                        ${secondaryPosts.map(post => this.renderMagazineSecondary(post)).join('')}
+                    </div>
+                ` : ''}
+                
+                <!-- Grid Normal para el Resto -->
+                ${remainingPosts.length > 0 ? `
+                    <div class="magazine-grid">
+                        <h3 class="section-title">Más Posts</h3>
+                        <div class="posts-grid">
+                            ${remainingPosts.map(post => this.renderPostCard(post)).join('')}
+                        </div>
+                    </div>
+                ` : ''}
             </div>
+        `;
+    }
+
+    renderMagazineHero(post) {
+        const categoryInfo = this.getCategoryInfo(post.category);
+        const hasImage = post.featured_image;
+        const imageUrl = hasImage ? this.getPostImage(post) : null;
+        
+        return `
+            <article class="magazine-hero-post" onclick="blog.showPost('${post.slug}')">
+                <div class="hero-image ${hasImage ? 'has-image' : 'no-image'}" 
+                    ${hasImage ? `style="background-image: url('${imageUrl}')"` : `style="background: linear-gradient(135deg, ${categoryInfo.color}, ${this.lightenColor(categoryInfo.color, 20)})"`}>
+                    ${!hasImage ? `
+                        <div class="hero-placeholder">
+                            ${categoryInfo.icon}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="hero-overlay">
+                        <div class="hero-content">
+                            <span class="hero-category" style="background: ${this.lightenColor(categoryInfo.color, 90)}; color: ${categoryInfo.color}">
+                                ${categoryInfo.icon} ${categoryInfo.name}
+                            </span>
+                            <h2 class="hero-title">${post.title}</h2>
+                            <p class="hero-excerpt">${post.excerpt}</p>
+                            <div class="hero-meta">
+                                <span>${this.formatDate(post.date)}</span>
+                                <button class="hero-read-btn" onclick="event.stopPropagation(); blog.showPost('${post.slug}')">
+                                    Leer Más →
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        `;
+    }
+
+    renderMagazineSecondary(post) {
+        const categoryInfo = this.getCategoryInfo(post.category);
+        const hasImage = post.featured_image;
+        const imageUrl = hasImage ? this.getPostImage(post) : null;
+        
+        return `
+            <article class="magazine-secondary-post" onclick="blog.showPost('${post.slug}')">
+                <div class="secondary-image ${hasImage ? 'has-image' : 'no-image'}" 
+                    ${hasImage ? `style="background-image: url('${imageUrl}')"` : `style="background: linear-gradient(135deg, ${categoryInfo.color}, ${this.lightenColor(categoryInfo.color, 20)})"`}>
+                    ${!hasImage ? `
+                        <div class="secondary-placeholder">
+                            ${categoryInfo.icon}
+                        </div>
+                    ` : ''}
+                </div>
+                <div class="secondary-content">
+                    <span class="post-category" style="background: ${this.lightenColor(categoryInfo.color, 90)}; color: ${categoryInfo.color}">
+                        ${categoryInfo.icon} ${categoryInfo.name}
+                    </span>
+                    <h3 class="secondary-title">${post.title}</h3>
+                    <p class="secondary-excerpt">${post.excerpt}</p>
+                    <div class="post-meta">
+                        <span>${this.formatDate(post.date)}</span>
+                        <button class="read-more-btn" onclick="event.stopPropagation(); blog.showPost('${post.slug}')">
+                            Leer más →
+                        </button>
+                    </div>
+                </div>
+            </article>
         `;
     }
 
@@ -178,11 +266,18 @@ class PremiumBlog {
 
     renderFeaturedPost(post) {
         const categoryInfo = this.getCategoryInfo(post.category);
+        const hasImage = post.featured_image;
+        const imageUrl = hasImage ? this.getPostImage(post) : null;
         
         return `
             <article class="featured-post" onclick="blog.showPost('${post.slug}')">
-                <div class="featured-image" style="background: linear-gradient(135deg, ${categoryInfo.color}, ${this.lightenColor(categoryInfo.color, 20)})">
-                    ${categoryInfo.icon}
+                <div class="featured-image ${hasImage ? 'has-image' : 'no-image'}" 
+                    ${hasImage ? `style="background-image: url('${imageUrl}')"` : `style="background: linear-gradient(135deg, ${categoryInfo.color}, ${this.lightenColor(categoryInfo.color, 20)})"`}>
+                    ${!hasImage ? `
+                        <div class="placeholder-icon">
+                            ${categoryInfo.icon}
+                        </div>
+                    ` : ''}
                 </div>
                 <div class="featured-content">
                     <span class="post-category" style="background: ${this.lightenColor(categoryInfo.color, 90)}; color: ${categoryInfo.color}">
@@ -192,13 +287,14 @@ class PremiumBlog {
                     <p class="featured-excerpt">${post.excerpt}</p>
                     <div class="post-meta">
                         <span>${this.formatDate(post.date)}</span>
-                        <button class="read-more-btn">Leer más →</button>
+                        <button class="read-more-btn" onclick="event.stopPropagation(); blog.showPost('${post.slug}')">
+                            Leer más →
+                        </button>
                     </div>
                 </div>
             </article>
         `;
     }
-
     renderNoResults() {
         return `
             <div class="no-results">
@@ -368,12 +464,39 @@ class PremiumBlog {
     }
     parseFrontMatter(lines) {
         const frontMatter = {};
-        for (let i = 1; i < lines.length; i++) {
-            if (lines[i] === '---') break;
-            if (lines[i].includes(':')) {
-                const [key, ...valueParts] = lines[i].split(':');
-                const value = valueParts.join(':').trim().replace(/['"]/g, '');
-                frontMatter[key.trim()] = value;
+        let inFrontMatter = false;
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            
+            if (line === '---') {
+                if (!inFrontMatter) {
+                    inFrontMatter = true;
+                    continue;
+                } else {
+                    break;
+                }
+            }
+            
+            if (inFrontMatter && line.includes(':')) {
+                const colonIndex = line.indexOf(':');
+                const key = line.substring(0, colonIndex).trim();
+                let value = line.substring(colonIndex + 1).trim();
+                
+                // **PROBLEMA: Solo maneja comillas al principio y final**
+                // Pero el valor puede tener espacios y otros caracteres
+                
+                // Mejorar el manejo de valores
+                if (value.startsWith('"') && value.endsWith('"')) {
+                    value = value.slice(1, -1);
+                } else if (value.startsWith("'") && value.endsWith("'")) {
+                    value = value.slice(1, -1);
+                }
+                
+                // **FIX: También limpiar espacios extra**
+                value = value.replace(/^['"]|['"]$/g, '').trim();
+                
+                frontMatter[key] = value;
             }
         }
         return frontMatter;
@@ -570,17 +693,6 @@ class PremiumBlog {
         });
     }
 
-    showPost(slug) {
-        // Navegar a la página del post individual
-        window.location.hash = `post-${slug}`;
-
-        // Por ahora mostrar alert, después implementar página individual
-        const post = this.posts.find(p => p.slug === slug);
-        if (post) {
-            alert(`Abriendo: ${post.title}\n\nEsta funcionalidad se implementará en la siguiente versión.`);
-        }
-    }
-
     resetFilters() {
         this.filters = {
             category: 'all',
@@ -625,38 +737,156 @@ class PremiumBlog {
         }
     }
     getPostImage(post) {
-
         if (post.featured_image) {
-            return `/img/${post.featured_image}`;
+            console.log('🔍 Featured image found:', post.featured_image);
+            
+            let imagePath = post.featured_image;
+            
+            // Si ya es una URL completa, dejarla como está
+            if (imagePath.startsWith('http')) {
+                return imagePath;
+            }
+            
+            // **FIX: Corregir la ruta base**
+            // Las imágenes están en /static/img/ no en /img/
+            if (imagePath.startsWith('/')) {
+                imagePath = imagePath.substring(1); // quitar el slash inicial
+            }
+            
+            // **IMPORTANTE: Agregar 'static/' a la ruta**
+            if (!imagePath.startsWith('static/') && !imagePath.startsWith('img/')) {
+                imagePath = `static/${imagePath}`;
+            }
+            
+            // Asegurar que la ruta sea correcta
+            if (imagePath.startsWith('img/')) {
+                imagePath = `static/${imagePath}`;
+            }
+            
+            const repoBase = 'https://raw.githubusercontent.com/Dan219/myBlog/main/';
+            const finalUrl = `${repoBase}${imagePath}`;
+            
+            console.log('🖼️ Final image URL:', finalUrl);
+            return finalUrl;
         }
+        
+        console.log('❌ No featured image for:', post.title);
         return null;
     }
-
+    enhancePostImages(modal) {
+        // Mejorar todas las imágenes dentro del contenido del post
+        const images = modal.querySelectorAll('.post-body img');
+        images.forEach(img => {
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            img.style.borderRadius = '8px';
+            img.style.margin = '1.5rem 0';
+            img.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+            
+            // Agregar loading lazy
+            img.loading = 'lazy';
+            
+            // Manejar errores de imágenes
+            img.onerror = function() {
+                this.style.display = 'none';
+            };
+        });
+        
+        // Mejorar bloques de código
+        const codeBlocks = modal.querySelectorAll('.post-body pre');
+        codeBlocks.forEach(block => {
+            block.style.position = 'relative';
+        });
+    }
     renderPostCard(post) {
         const categoryInfo = this.getCategoryInfo(post.category);
-        const hasImage = post.featured_image; // Solo chequea imagen del post
+        const hasImage = post.featured_image;
+        const imageUrl = hasImage ? this.getPostImage(post) : null;
         
         return `
-            <article class="post-card">
-            <div class="post-image" ${hasImage ? 
-                `style="background-image: url('${this.getPostImage(post)}')"` : 
-                `style="background: linear-gradient(135deg, ${categoryInfo.color}, ${this.lightenColor(categoryInfo.color, 20)})"`}>
-                ${!hasImage ? categoryInfo.icon : ''}
-            </div>
-            <div class="post-content">
-                <span class="post-category" style="background: ${this.lightenColor(categoryInfo.color, 90)}; color: ${categoryInfo.color}">
-                ${categoryInfo.icon} ${categoryInfo.name}
-                </span>
-                <h3 class="post-title">${post.title}</h3>
-                <p class="post-excerpt">${post.excerpt}</p>
-                <div class="post-meta">
-                <span>${this.formatDate(post.date)}</span>
-                <button class="read-more-btn">Leer más →</button>
+            <article class="post-card" onclick="blog.showPost('${post.slug}')">
+                <div class="post-image ${hasImage ? 'has-image' : ''}" 
+                    ${hasImage ? `style="background-image: url('${imageUrl}')"` : ''}>
+                    ${!hasImage ? categoryInfo.icon : ''}
                 </div>
-            </div>
+                <div class="post-content">
+                    <span class="post-category" style="background: ${this.lightenColor(categoryInfo.color, 90)}; color: ${categoryInfo.color}">
+                        ${categoryInfo.icon} ${categoryInfo.name}
+                    </span>
+                    <h3 class="post-title">${post.title}</h3>
+                    <p class="post-excerpt">${post.excerpt}</p>
+                    <div class="post-meta">
+                        <span>${this.formatDate(post.date)}</span>
+                        <button class="read-more-btn" onclick="event.stopPropagation(); blog.showPost('${post.slug}')">
+                            Leer más →
+                        </button>
+                    </div>
+                </div>
             </article>
         `;
     }
+    showPost(slug) {
+        const post = this.posts.find(p => p.slug === slug);
+        if (!post) return;
+
+        const categoryInfo = this.getCategoryInfo(post.category);
+        const hasImage = post.featured_image;
+        const imageUrl = hasImage ? this.getPostImage(post) : null;
+
+        const modal = document.createElement('div');
+        modal.className = 'post-modal';
+        modal.innerHTML = `
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <button class="close-modal" onclick="this.closest('.post-modal').remove()">×</button>
+                <article class="full-post">
+                    <div class="post-header">
+                        ${hasImage ? `
+                            <div class="post-hero-image">
+                                <img src="${imageUrl}" alt="${post.title}" onerror="this.style.display='none'" />
+                            </div>
+                        ` : `
+                            <div class="post-hero-placeholder" style="background: linear-gradient(135deg, ${categoryInfo.color}, ${this.lightenColor(categoryInfo.color, 20)})">
+                                <div class="placeholder-icon">${categoryInfo.icon}</div>
+                            </div>
+                        `}
+                        <span class="post-category" style="color: ${categoryInfo.color}; border: 1px solid ${categoryInfo.color}">
+                            ${categoryInfo.icon} ${categoryInfo.name}
+                        </span>
+                        <h1>${post.title}</h1>
+                        <time>${this.formatDate(post.date)}</time>
+                    </div>
+                    <div class="post-body">
+                        ${post.body}
+                    </div>
+                </article>
+            </div>
+        `;
+        
+        // **FIX: Cerrar modal al hacer click fuera**
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+        
+        // **FIX: Cerrar modal con ESC key**
+        const closeModal = () => modal.remove();
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') closeModal();
+        };
+        
+        document.addEventListener('keydown', handleEscape);
+        modal._handleEscape = handleEscape;
+        
+        document.body.appendChild(modal);
+        
+        // Enfocar el modal para que ESC funcione inmediatamente
+        modal.focus();
+        
+        // Mejorar el renderizado de imágenes dentro del contenido del post
+        this.enhancePostImages(modal);
+    }
+
 }
 
 // CSS adicional para nuevas vistas
@@ -787,3 +1017,593 @@ document.head.appendChild(style);
 // Inicializar la aplicación
 const blog = new PremiumBlog();
 
+// Y CSS para el modal
+const modalCSS = `
+.post-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 15px;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    width: 100%;
+}
+
+.close-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 2001;
+}
+
+.full-post {
+    padding: 3rem;
+}
+
+.post-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.post-body {
+    line-height: 1.8;
+}
+
+.post-body img {
+    max-width: 100%;
+    border-radius: 10px;
+    margin: 1rem 0;
+}
+`;
+// Agregar el CSS al documento
+const modalStyle = document.createElement('style');
+modalStyle.textContent = modalCSS;
+document.head.appendChild(modalStyle);
+
+// Agrega esto al final de additionalCSS
+const gridClickableCSS = `
+    .post-card {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .post-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .read-more-btn {
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+    
+    .read-more-btn:hover {
+        color: #1e40af;
+    }
+`;
+
+// Injectar el CSS
+const gridStyle = document.createElement('style');
+gridStyle.textContent = gridClickableCSS;
+document.head.appendChild(gridStyle);
+
+// Agregar este CSS para magazine view y modal
+const magazineModalCSS = `
+    /* Magazine View Styles */
+    .magazine-featured {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .featured-post {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .featured-post:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    
+    .featured-image {
+        width: 100%;
+        height: 250px;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    
+    .featured-image.no-image {
+        background: linear-gradient(135deg, var(--primary-color, #3b82f6), #60a5fa);
+    }
+    
+    .featured-content {
+        padding: 2rem;
+    }
+    
+    .featured-title {
+        font-size: 1.5rem;
+        margin: 1rem 0;
+        line-height: 1.3;
+    }
+    
+    .featured-excerpt {
+        color: #6b7280;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+    
+    /* Modal Improvements */
+    .post-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        backdrop-filter: blur(5px);
+    }
+    
+    .modal-content {
+        background: white;
+        border-radius: 15px;
+        max-width: 800px;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        width: 100%;
+        animation: modalAppear 0.3s ease;
+    }
+    
+    @keyframes modalAppear {
+        from {
+            opacity: 0;
+            transform: scale(0.9) translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+    
+    .close-modal {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: #dc2626;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        z-index: 2001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+    
+    .close-modal:hover {
+        background: #b91c1c;
+        transform: scale(1.1);
+    }
+    
+    .full-post {
+        padding: 3rem;
+    }
+    
+    .post-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .post-hero-image {
+        width: 100%;
+        max-height: 400px;
+        overflow: hidden;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+    
+    .post-hero-image img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+    
+    .post-hero-placeholder {
+        width: 100%;
+        height: 200px;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+    
+    .post-hero-placeholder .placeholder-icon {
+        font-size: 3rem;
+        opacity: 0.9;
+    }
+    
+    .post-header .post-category {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        background: transparent !important;
+    }
+    
+    .post-header h1 {
+        font-size: 2.5rem;
+        margin: 1rem 0;
+        line-height: 1.2;
+    }
+    
+    .post-header time {
+        color: #6b7280;
+        font-size: 1rem;
+    }
+    
+    .post-body {
+        line-height: 1.8;
+        font-size: 1.1rem;
+    }
+    
+    .post-body img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: 1.5rem 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .post-body pre {
+        background: #1f2937;
+        color: #f8f8f2;
+        padding: 1.5rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 1.5rem 0;
+        font-size: 0.9rem;
+    }
+    
+    .post-body code {
+        background: #f1f5f9;
+        color: #dc2626;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-size: 0.9em;
+    }
+    
+    .post-body pre code {
+        background: transparent;
+        color: inherit;
+        padding: 0;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .magazine-featured {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .modal-content {
+            margin: 1rem;
+            max-height: 95vh;
+        }
+        
+        .full-post {
+            padding: 2rem 1.5rem;
+        }
+        
+        .post-header h1 {
+            font-size: 2rem;
+        }
+        
+        .featured-image {
+            height: 200px;
+        }
+    }
+`;
+
+// Injectar el CSS
+const magazineModalStyle = document.createElement('style');
+magazineModalStyle.textContent = magazineModalCSS;
+document.head.appendChild(magazineModalStyle);
+
+// Reemplazar el CSS del magazine view
+const trueMagazineCSS = `
+    /* Magazine Layout Real */
+    .magazine-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+    
+    /* Hero Post - Grande y destacado */
+    .magazine-hero-post {
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        height: 500px;
+        position: relative;
+    }
+    
+    .magazine-hero-post:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+    }
+    
+    .hero-image {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: relative;
+    }
+    
+    .hero-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0,0,0,0.8));
+        color: white;
+        padding: 3rem;
+    }
+    
+    .hero-content {
+        max-width: 600px;
+    }
+    
+    .hero-category {
+        background: rgba(255,255,255,0.9) !important;
+        color: #333 !important;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: inline-block;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+        margin: 1rem 0;
+        color: white;
+        line-height: 1.2;
+    }
+    
+    .hero-excerpt {
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+        color: rgba(255,255,255,0.9);
+        line-height: 1.5;
+    }
+    
+    .hero-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: rgba(255,255,255,0.8);
+    }
+    
+    .hero-read-btn {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: 2px solid rgba(255,255,255,0.5);
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+    
+    .hero-read-btn:hover {
+        background: white;
+        color: #333;
+        border-color: white;
+    }
+    
+    /* Posts Secundarios */
+    .magazine-secondary {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+    
+    .magazine-secondary-post {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .magazine-secondary-post:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .secondary-image {
+        width: 100%;
+        height: 200px;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .secondary-placeholder {
+        font-size: 2rem;
+        color: white;
+    }
+    
+    .secondary-content {
+        padding: 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .secondary-title {
+        font-size: 1.3rem;
+        margin: 0.5rem 0;
+        line-height: 1.3;
+        flex-grow: 1;
+    }
+    
+    .secondary-excerpt {
+        color: #6b7280;
+        margin-bottom: 1rem;
+        line-height: 1.4;
+    }
+    
+    /* Sección de más posts */
+    .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        color: #374151;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 0.5rem;
+    }
+    
+    .magazine-grid .posts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+        
+        .hero-excerpt {
+            font-size: 1.1rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .magazine-hero-post {
+            height: 400px;
+        }
+        
+        .hero-overlay {
+            padding: 2rem;
+        }
+        
+        .hero-title {
+            font-size: 1.8rem;
+        }
+        
+        .magazine-secondary {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        .magazine-grid .posts-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .magazine-hero-post {
+            height: 350px;
+        }
+        
+        .hero-overlay {
+            padding: 1.5rem;
+        }
+        
+        .hero-title {
+            font-size: 1.5rem;
+        }
+        
+        .hero-excerpt {
+            font-size: 1rem;
+        }
+    }
+`;
+
+// Reemplazar el CSS anterior
+const magazineStyle = document.createElement('style');
+magazineStyle.textContent = trueMagazineCSS;
+document.head.appendChild(magazineStyle);
+
+// En el CSS, agregar placeholders específicos para magazine
+const placeholderCSS = `
+    .hero-placeholder, .secondary-placeholder {
+        font-size: 4rem;
+        color: white;
+        opacity: 0.8;
+    }
+    
+    .secondary-placeholder {
+        font-size: 2rem;
+    }
+    
+    .no-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+`;
+
+const placeholderStyle = document.createElement('style');
+placeholderStyle.textContent = placeholderCSS;
+document.head.appendChild(placeholderStyle);

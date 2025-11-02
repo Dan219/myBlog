@@ -297,16 +297,7 @@ body {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
-.post-image {
-  width: 100%;
-  height: 200px;
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 2rem;
-}
+
 
 .post-content {
   padding: 1.5rem;
@@ -435,42 +426,32 @@ body {
     text-align: center;
   }
 }
+
+/* POST IMAGE - ESTADO UNIFICADO */
 .post-image {
   width: 100%;
   height: 200px;
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  overflow: hidden;
 }
 
-/* Estado por defecto - con gradient e icono */
-.post-image::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+/* ESTADO POR DEFECTO (sin imagen) */
+.post-image:not(.has-image) {
   background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
-  z-index: 1;
-}
-
-.post-image .post-icon {
-  position: relative;
-  z-index: 2;
   color: white;
   font-size: 2rem;
 }
 
-/* Cuando hay imagen - oculta gradient e icono */
-.post-image.has-image::before,
-.post-image.has-image .post-icon {
-  display: none;
+/* ESTADO CON IMAGEN */
+.post-image.has-image {
+  background-color: transparent;
+  color: transparent; /* Ocultar texto/icono */
 }
 
-.post-image.has-image {
-  background-image: var(--post-image-url);
-}
+/* Eliminar todas las reglas conflictivas anteriores y usar solo estas */
