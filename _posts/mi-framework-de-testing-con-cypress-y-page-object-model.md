@@ -1,6 +1,8 @@
 ---
 title: Mi Framework de Testing con Cypress y Page Object Model
 date: 2025-11-01T23:24:30.441Z
+category: programacion
+excerpt: "Implementación de un framework de testing automatizado con Cypress, TypeScript y Page Object Model para pruebas escalables y mantenibles."
 ---
 # Mi Framework de Testing con Cypress y Page Object Model
 

@@ -3,41 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daniel Flores - Blog Técnico</title>
+    <title>Daniel Flores - Blog Multitemático</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-    <header class="header">
-        <div class="container">
-            <div class="logo">
-                <!-- Temporal: placeholder hasta que subas foto -->
-                <div class="profile-pic" style="background: #3498db; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">DF</div>
-                <a href="/" class="logo-text">Daniel Flores - Blog Técnico</a>
+    <!-- Fondo animado -->
+    <div class="animated-bg"></div>
+    
+    <!-- Header estilo glass -->
+    <header class="glass-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <img src="/static/img/profile-pic.jpg" alt="Daniel Flores" class="profile-pic" onerror="this.style.display='none'">
+                <div class="logo-text">
+                    <h1>Daniel Flores</h1>
+                    <p>Blog Multitemático</p>
+                </div>
             </div>
-            <nav class="nav">
-                <ul>
-                    <li><a href="/">Inicio</a></li>
-                    <li><a href="/admin/">CMS</a></li>
-                    <li><a href="https://github.com/Dan219" target="_blank">GitHub</a></li>
-                    <li><a href="https://github.com/Dan219?tab=repositories" target="_blank">Proyectos</a></li>
-                </ul>
+            
+            <div class="search-section">
+                <div class="search-bar">
+                    <input type="text" id="search-input" placeholder="Buscar posts...">
+                    <button class="search-btn">🔍</button>
+                </div>
+            </div>
+            
+            <nav class="main-nav">
+                <a href="/" class="nav-link active">Inicio</a>
+                <a href="/admin/" class="nav-link">CMS</a>
+                <a href="https://github.com/Dan219" class="nav-link" target="_blank">GitHub</a>
             </nav>
         </div>
     </header>
 
-    <main class="main-content container">
-        <section class="posts-section">
-            <h2>Últimos Posts</h2>
-            <div id="posts-container">
-                <p>Cargando posts...</p>
+    <!-- Layout principal con sidebar -->
+    <div class="main-layout">
+        <!-- Sidebar de filtros -->
+        <aside class="glass-sidebar">
+            <div class="sidebar-content">
+                <h3>📁 Categorías</h3>
+                <div class="category-filters">
+                    <button class="filter-btn active" data-category="all">Todos</button>
+                    <button class="filter-btn" data-category="programacion">💻 Programación</button>
+                    <button class="filter-btn" data-category="anime">🎌 Anime</button>
+                    <button class="filter-btn" data-category="videojuegos">🎮 Videojuegos</button>
+                    <button class="filter-btn" data-category="tecnologia">🚀 Tecnología</button>
+                    <button class="filter-btn" data-category="personal">📝 Personal</button>
+                </div>
+                
+                <div class="sidebar-divider"></div>
+                
+                <h3>🔥 Trending</h3>
+                <div class="trending-posts" id="trending-sidebar">
+                    <!-- Posts populares se cargan con JS -->
+                </div>
+                
+                <div class="sidebar-divider"></div>
+                
+                <h3>🎯 Filtros</h3>
+                <div class="sort-filters">
+                    <select id="sort-select" class="sort-select">
+                        <option value="newest">Más recientes</option>
+                        <option value="oldest">Más antiguos</option>
+                        <option value="popular">Más populares</option>
+                    </select>
+                </div>
             </div>
-        </section>
-    </main>
+        </aside>
 
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 Daniel Flores - Blog Técnico</p>
+        <!-- Área de contenido principal -->
+        <main class="content-area">
+            <div class="content-header">
+                <h2 id="content-title">Todos los Posts</h2>
+                <div class="view-controls">
+                    <button class="view-btn active" data-view="grid">⏹️ Grid</button>
+                    <button class="view-btn" data-view="list">📋 Lista</button>
+                    <button class="view-btn" data-view="magazine">📰 Revista</button>
+                </div>
+            </div>
+
+            <div class="posts-container" id="posts-container">
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p>Cargando posts...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="glass-footer">
+        <div class="footer-content">
+            <p>&copy; 2024 Daniel Flores - Blog creado con ❤️ y mucho código</p>
+            <div class="social-links">
+                <a href="https://github.com/Dan219" target="_blank">GitHub</a>
+                <a href="#" class="newsletter-btn">Suscribirse</a>
+            </div>
         </div>
     </footer>
 
