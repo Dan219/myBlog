@@ -443,11 +443,34 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+
+/* Estado por defecto - con gradient e icono */
+.post-image::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+  z-index: 1;
+}
+
+.post-image .post-icon {
+  position: relative;
+  z-index: 2;
   color: white;
   font-size: 2rem;
 }
 
-/* Cuando hay imagen, el icono se oculta automáticamente */
-.post-image[style*="background-image"] {
-  /* El gradient se reemplaza por la imagen */
+/* Cuando hay imagen - oculta gradient e icono */
+.post-image.has-image::before,
+.post-image.has-image .post-icon {
+  display: none;
+}
+
+.post-image.has-image {
+  background-image: var(--post-image-url);
 }
